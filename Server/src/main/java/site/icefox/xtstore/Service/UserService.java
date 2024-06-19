@@ -39,7 +39,7 @@ public class UserService {
                 RespSendUtil.sendErrorResponse(response, "缺少必要参数!");
                 return;
             }
-            int reqUserID = Integer.parseInt(reqUserIDS);
+            long reqUserID = Long.parseLong(reqUserIDS);
             if (UserDao.isUserExist(reqUserID)) {
                 RespSendUtil.sendErrorResponse(response, "UserID已存在");
                 return;
@@ -92,7 +92,7 @@ public class UserService {
                 RespSendUtil.sendErrorResponse(response, "用户名或密码不能为空");
                 return;
             }
-            int UserID = Integer.parseInt(reqUserID);
+            long UserID = Long.parseLong(reqUserID);
             User user = UserDao.queryOneUserByID(UserID);
             if (user == null) {
                 RespSendUtil.sendErrorResponse(response, "用户不存在");
@@ -125,7 +125,7 @@ public class UserService {
     public static User getUserInfoFromHeader(HttpServletRequest request) {
         String Authorization = request.getHeader("Authorization");
         try {
-            int UserID = Integer.parseInt((String) JwtUtil.decodeJwt(Authorization).get("UserID"));
+            long UserID = Long.parseLong((String) JwtUtil.decodeJwt(Authorization).get("UserID"));
             return UserDao.queryOneUserByID(UserID);
         } catch (Exception e) {
             return null;
@@ -162,7 +162,7 @@ public class UserService {
      */
     public static void deleteUser(HttpServletRequest request, HttpServletResponse response) {
         User reqUser = UserService.getUserInfoFromHeader(request);
-        int UserIDtoDel;
+        long UserIDtoDel;
         String respMsg = "未知的错误!";
 
         try {
@@ -216,7 +216,7 @@ public class UserService {
             }
             String paramUserID;
             String paramUserType = request.getParameter("UserType") != null ? request.getParameter("UserType") : "0";
-            int reqUserID;
+            long reqUserID;
             int reqUserType;
             if (reqUser.getUserID() == 2) {
                 paramUserID = request.getParameter("UserID") != null ? request.getParameter("UserID") : null;
@@ -316,7 +316,7 @@ public class UserService {
     }
 
 
-    public static boolean updateUserCartByStr(int UserID, String CartStr) {
+    public static boolean updateUserCartByStr(long UserID, String CartStr) {
         List<GoodsInCart> reqList = JsonUtil.toObjects(CartStr, GoodsInCart.class);
         List<GoodsInCart> resultList = new ArrayList<>();
         try {

@@ -30,6 +30,23 @@ public class ImageFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
+        //设置跨域访问
+        //允许跨域的主机地址
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        //允许跨域的请求方法GET, POST, HEAD 等
+        response.setHeader("Access-Control-Allow-Methods", "*");
+        //允许跨域的请求头
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        response.setHeader("Access-Control-Expose-Headers", "*");
+
+        // 对于 OPTIONS 请求，直接返回成功
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+
+
+
         if (!allowedMethods.contains(request.getMethod())) {
             RespSendUtil.sendErrorResponse(response, "Method Not Allowed");
             return;

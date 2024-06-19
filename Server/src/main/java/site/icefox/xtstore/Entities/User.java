@@ -5,7 +5,7 @@ import site.icefox.xtstore.Utils.Interface.JsonExclude;
 
 @Data
 public class User {
-    private int UserID;
+    private long UserID;
     private String UserName;
     @JsonExclude
     private String Password;

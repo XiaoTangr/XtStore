@@ -1,31 +1,22 @@
 <template>
-    <nav>
-        webnav
-    </nav>
 
-    <RouterView>
-
-    </RouterView>
+    <FrontHeader />
+    <main>
+        <RouterView />
+    </main>
+    <FrontFooter />
     <!-- <p>{{ Data }}</p> -->
 
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import InstanceUtil from '@/utils/InstanceUtil';
 
-const Data = ref([])
+import FrontHeader from '@/components/Frontend/FrontHeader.vue';
+import FrontFooter from '@/components/Frontend/FrontFooter.vue';
 
-onMounted(() => {
-    // 获取数据
-    InstanceUtil.get('/api/goods')
-        .then(response => {
-            console.log('Goods:', response.data);
-            // 处理数据
-            Data.value = response.data.data;
-        })
-        .catch(error => {
-            console.error('Error fetching goods:', error);
-        });
-});
 </script>
-<style scoped></style>
+<style scoped>
+main {
+    height: calc(100vh - 6em);
+    overflow-y: auto;
+}
+</style>

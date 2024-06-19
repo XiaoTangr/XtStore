@@ -1,10 +1,13 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import ApiUtil from '@/utils/ApiUtil';
+import InstanceUtil from '@/utils/ApiUtil';
+import JwtUtil from '@/utils/JwtUtil';
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
     {
-      path: '/',
+      path: '/:GoodsCate?',
       name: 'home',
       component: () => import('../views/Frontend/IndexView.vue'),
       children: [
@@ -48,11 +51,38 @@ const router = createRouter({
       ]
     },
     {
-      path: "/auth",
+      path: "/auth/:operation?",
       name: "auth",
-      component: () => import('../views/AuthView.vue')
-    },
+      component: () => import('../views/AuthView.vue'),
+      beforeEnter: (to, from, next) => {
+        const operation = to.params.operation || 'login';
+        if (operation !== 'login' && operation !== 'register') {
+          next('/auth/login');
+        } else {
+          to.meta.operation = operation;
+          next();
+        }
+      }
+    }
   ]
 })
 
+router.beforeEach((to, from, next) => {
+  const allowedPaths = ['','/','/about', '/auth/', '/auth/login', '/auth/register'];
+  if (allowedPaths.includes(to.path)) {
+    next();
+  } else {
+    if (JwtUtil.isJwtExist()) {
+      ApiUtil.get('/api/auth').then(response => {
+        if (response.data.code === 200) {
+          next();
+        } else {
+          router.push('/auth/login');
+        }
+      })
+    } else {
+      router.push('/auth/login');
+    }
+  }
+})
 export default router

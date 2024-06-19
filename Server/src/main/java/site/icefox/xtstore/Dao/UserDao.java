@@ -26,7 +26,7 @@ public class UserDao {
             conn = mydb.getConn();
             String sql = "INSERT INTO User (UserID,UserName, Password, UserType,UserCart,UserPhone,UserAddr) VALUES (?,?,?,?, ?, ?, ?)";
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, user.getUserID());
+            pstmt.setLong(1, user.getUserID());
             pstmt.setString(2, user.getUserName());
             pstmt.setString(3, user.getPassword());
             pstmt.setInt(4, user.getUserType());
@@ -47,7 +47,7 @@ public class UserDao {
      * @return 结果
      * @throws SQLException e
      */
-    public static boolean deleteUser(int UserID) throws SQLException {
+    public static boolean deleteUser(long  UserID) throws SQLException {
         DbConnectionUtil mydb = new DbConnectionUtil();
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -55,7 +55,7 @@ public class UserDao {
             conn = mydb.getConn();
             String sql = "DELETE FROM User WHERE UserID = ?";
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, UserID);
+            pstmt.setLong(1, UserID);
             return pstmt.executeUpdate() > 0;
         } finally {
             if (pstmt != null) pstmt.close();
@@ -70,7 +70,7 @@ public class UserDao {
      * @return User对象
      * @throws SQLException e
      */
-    public static User queryOneUserByID(int UserID) throws SQLException {
+    public static User queryOneUserByID(long UserID) throws SQLException {
         DbConnectionUtil mydb = new DbConnectionUtil();
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -81,7 +81,7 @@ public class UserDao {
             conn = mydb.getConn();
             String sql = "SELECT * FROM User WHERE UserID = ?";
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, UserID);
+            pstmt.setLong(1, UserID);
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
@@ -168,7 +168,7 @@ public class UserDao {
             pstmt.setString(4, user.getUserCart());
             pstmt.setString(5, user.getUserPhone());
             pstmt.setString(6, user.getUserAddr());
-            pstmt.setInt(7, user.getUserID());
+            pstmt.setLong(7, user.getUserID());
             return pstmt.executeUpdate() > 0;
         } finally {
             if (pstmt != null) pstmt.close();
@@ -182,7 +182,7 @@ public class UserDao {
      * @param UserID 用户ID
      * @return true or false
      */
-    public static boolean isUserExist(int UserID) throws SQLException {
+    public static boolean isUserExist(long UserID) throws SQLException {
 
         DbConnectionUtil mydb = new DbConnectionUtil();
         Connection conn = null;
@@ -191,7 +191,7 @@ public class UserDao {
             conn = mydb.getConn();
             String sql = "select * from user WHERE UserID = ?";
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, UserID);
+            pstmt.setLong(1, UserID);
             return pstmt.executeQuery().next();
         } finally {
             if (pstmt != null) pstmt.close();
@@ -207,7 +207,7 @@ public class UserDao {
      * @return boolean
      * @throws SQLException e
      */
-    public static boolean updateUserCart(int USerID, String CartStr) throws SQLException {
+    public static boolean updateUserCart(long USerID, String CartStr) throws SQLException {
         DbConnectionUtil mydb = new DbConnectionUtil();
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -216,7 +216,7 @@ public class UserDao {
             String sql = "UPDATE User SET UserCart =? WHERE UserID =?";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, CartStr);
-            pstmt.setInt(2, USerID);
+            pstmt.setLong(2, USerID);
             return pstmt.executeUpdate() > 0;
         } finally {
             if (pstmt != null) pstmt.close();
@@ -230,7 +230,7 @@ public class UserDao {
      * @param UserID 用户ID
      * @return 购物车json
      */
-    public static String queryUserCart(int UserID) throws SQLException {
+    public static String queryUserCart(long UserID) throws SQLException {
         DbConnectionUtil mydb = new DbConnectionUtil();
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -239,7 +239,7 @@ public class UserDao {
             conn = mydb.getConn();
             String sql = "SELECT UserCart FROM User WHERE UserID =?";
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, UserID);
+            pstmt.setLong(1, UserID);
             rs = pstmt.executeQuery();
             if (rs.next()) {
                 return rs.getString("UserCart");

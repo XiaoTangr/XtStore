@@ -47,10 +47,19 @@ public class ImageService {
                 if (fileName == null || fileName.isEmpty()) {
                     continue; // 如果文件名为空，跳过该文件部分
                 }
+                // 获取文件类型
+                String contentType = part.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    RespSendUtil.sendErrorResponse(response, "无效的文件类型，期望 image/*");
+                    return;
+                }
+
+                // 获取图像格式 (如 "png", "jpeg")
+                String imageFormat = contentType.substring(contentType.lastIndexOf('/') + 1);
 
                 // 读取文件内容并进行 Base64 编码
                 try (InputStream inputStream = part.getInputStream()) {
-                    String imageBase64 = ImageUtil.encodeImageToBase64(inputStream);
+                    String imageBase64 = ImageUtil.encodeImageToBase64(inputStream,imageFormat);
 
                     // 更新编码后的图片到数据库
                     if (GoodsDao.updateGoodsImage(goodsId, imageBase64)) {
@@ -101,13 +110,22 @@ public class ImageService {
                 if (fileName == null || fileName.isEmpty()) {
                     continue; // 如果文件名为空，跳过该文件部分
                 }
+                // 获取文件类型
+                String contentType = part.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    RespSendUtil.sendErrorResponse(response, "无效的文件类型，期望 image/*");
+                    return;
+                }
+
+                // 获取图像格式 (如 "png", "jpeg")
+                String imageFormat = contentType.substring(contentType.lastIndexOf('/') + 1);
 
                 // 读取文件内容并进行 Base64 编码
                 try (InputStream inputStream = part.getInputStream()) {
-                    String imageBase64 = ImageUtil.encodeImageToBase64(inputStream);
+                    String imageBase64 = ImageUtil.encodeImageToBase64(inputStream, imageFormat);
 
                     // 更新编码后的图片到数据库
-                    if (GoodsDao.updateGoodsImage(goodsId, imageBase64)) {
+                    if (!GoodsDao.updateGoodsImage(goodsId, imageBase64)) {
                         RespSendUtil.sendErrorResponse(response, "保存图片到数据库失败");
                         return;
                     }

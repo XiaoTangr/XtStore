@@ -68,7 +68,7 @@ public class CartService {
      * @return list of GoodsInCart
      * @throws SQLException e
      */
-    private static List<GoodsInCart> getUserCartByID(int UserID) throws SQLException {
+    private static List<GoodsInCart> getUserCartByID(long UserID) throws SQLException {
         String list = UserDao.queryUserCart(UserID);
         return JsonUtil.toObjects(list, GoodsInCart.class);
     }
