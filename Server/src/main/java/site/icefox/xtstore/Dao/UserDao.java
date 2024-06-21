@@ -1,7 +1,9 @@
 package site.icefox.xtstore.Dao;
 
+import site.icefox.xtstore.Entities.GoodsInCart;
 import site.icefox.xtstore.Entities.User;
 import site.icefox.xtstore.Utils.DbConnectionUtil;
+import site.icefox.xtstore.Utils.JsonUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -47,7 +49,7 @@ public class UserDao {
      * @return 结果
      * @throws SQLException e
      */
-    public static boolean deleteUser(long  UserID) throws SQLException {
+    public static boolean deleteUser(long UserID) throws SQLException {
         DbConnectionUtil mydb = new DbConnectionUtil();
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -85,7 +87,7 @@ public class UserDao {
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                user.setUserID(rs.getInt("UserID"));
+                user.setUserID(rs.getLong("UserID"));
                 user.setUserName(rs.getString("UserName"));
                 user.setPassword(rs.getString("Password"));
                 user.setUserType(rs.getInt("UserType"));
@@ -122,7 +124,7 @@ public class UserDao {
             List<User> list = new ArrayList<>();
             while (rs.next()) {
                 User user = new User();
-                user.setUserID(rs.getInt("UserID"));
+                user.setUserID(rs.getLong("UserID"));
                 user.setUserName(rs.getString("UserName"));
                 user.setPassword(rs.getString("Password"));
                 user.setUserType(rs.getInt("UserType"));
@@ -230,7 +232,7 @@ public class UserDao {
      * @param UserID 用户ID
      * @return 购物车json
      */
-    public static String queryUserCart(long UserID) throws SQLException {
+    public static List<GoodsInCart> queryUserCart(long UserID) throws SQLException {
         DbConnectionUtil mydb = new DbConnectionUtil();
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -242,7 +244,8 @@ public class UserDao {
             pstmt.setLong(1, UserID);
             rs = pstmt.executeQuery();
             if (rs.next()) {
-                return rs.getString("UserCart");
+                String str =  rs.getString("UserCart");
+                return JsonUtil.toObjects(str,GoodsInCart.class);
             }
         } finally {
             if (rs != null) rs.close();

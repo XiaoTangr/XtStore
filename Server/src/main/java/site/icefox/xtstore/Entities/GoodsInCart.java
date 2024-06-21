@@ -8,5 +8,4 @@ public class GoodsInCart {
     private double GoodsPerPrice;
     private int GoodsID;
     private String GoodsName;
-    private String GoodsImg;
 }

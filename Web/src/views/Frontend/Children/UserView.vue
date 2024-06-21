@@ -35,9 +35,8 @@
             </el-form>
             <template #footer>
                 <div class="btn-container">
-                    <el-button @click="isEdit = !isEdit" class="btn" type="primary">{{ isEdit ? '取消修改' :
-                        '修改信息' }}</el-button>
-
+                    <el-button @click="isEdit = !isEdit" class="btn" type="primary">{{ isEdit ? '取消修改' : '修改信息'
+                        }}</el-button>
                     <el-button @click="onSubmitLogout" class="btn">退出登录</el-button>
                 </div>
             </template>
@@ -45,27 +44,58 @@
 
         </el-card>
         <div class="UserCart-Container">
+            <el-button @click="saveCart">
+                saveCart
+            </el-button>
+            <el-card v-for="(item, index) in tempUserCart" :key="index" :cart="item">
+                名称: {{ item.GoodsName }}
+                单价: ${{ item.GoodsPerPrice }}
+                数量:
+                <el-input-number v-model="item.CountNum" :min="0" controls-position="right" :precision="0"
+                    size="small" />
+                合计: ${{ item.GoodsPerPrice * item.CountNum }}
+            </el-card>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
-import type { FormInstance, FormRules } from 'element-plus';
-import { useUserDataStore } from '@/stores/UserData';
+import { reactive, ref, watch } from 'vue';
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus';
 import { storeToRefs } from 'pinia';
 import UpdateUserPwd from "@/components/Frontend/UpdateUserPwd.vue"
+import { useFrontDataStore } from '@/stores/FrontData';
 
 const UserInfoFormRef = ref<FormInstance>();
 
-const useUserData = useUserDataStore();
+const FrontDataStore = useFrontDataStore();
 
-const UserData = storeToRefs(useUserData);
+const { tempUserCart, UserData } = storeToRefs(FrontDataStore);
+
+
+const saveCart = async () => {
+    const res = await FrontDataStore.saveCarttoDB()
+    if (res) {
+        ElMessage.success('保存成功');
+    } else {
+        ElMessage.error('保存失败');
+    }
+};
+watch(tempUserCart, (newVal, oldVal) => {
+    // 监听tempUserCart的变化，当CountNum为0时，移除该商品。
+    for (let i = newVal.length - 1; i >= 0; i--) {
+        if (newVal[i].CountNum === 0) {
+            newVal.splice(i, 1);
+        }
+    }
+
+}, { deep: true });
+
 const UserInfoForm = reactive({
-    UserID: UserData.UserData.value.UserID,
-    UserName: UserData.UserData.value.UserName,
-    UserPhone: UserData.UserData.value.UserPhone,
-    UserAddr: UserData.UserData.value.UserAddr,
+    UserID: UserData.value.UserID,
+    UserName: UserData.value.UserName,
+    UserPhone: UserData.value.UserPhone,
+    UserAddr: UserData.value.UserAddr,
 });
 
 const isEdit = ref(false);
@@ -92,7 +122,7 @@ const onSubmitUpdate = () => {
     if (!formRef) return;
     formRef.validate((valid) => {
         if (valid) {
-            useUserData.updateUserData(UserInfoForm);
+            FrontDataStore.updateUserData(UserInfoForm);
         } else {
             console.log('表单验证失败');
         }
@@ -107,7 +137,7 @@ const onSubmitDelete = () => {
     //TODO 提交删除账号请求
 }
 const onSubmitLogout = () => {
-    useUserData.logout();
+    FrontDataStore.logout();
 };
 </script>
 

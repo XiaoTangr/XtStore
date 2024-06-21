@@ -1,5 +1,6 @@
 package site.icefox.xtstore.Service;
 
+import com.mysql.cj.log.Log;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import site.icefox.xtstore.Dao.GoodsDao;
@@ -88,7 +89,6 @@ public class UserService {
 
 
             if (reqUserID == null || reqUserPwd == null) {
-                System.out.println(reqUserID + " " + reqUserPwd);
                 RespSendUtil.sendErrorResponse(response, "用户名或密码不能为空");
                 return;
             }
@@ -176,7 +176,7 @@ public class UserService {
                         RespSendUtil.sendErrorResponse(response, "缺少必要参数");
                         return;
                     }
-                    UserIDtoDel = Integer.parseInt(reqUserID);
+                    UserIDtoDel = Long.parseLong(reqUserID);
                     respMsg = "管理员成功删除用户: " + UserIDtoDel;
                 } else {
 //                非管理员只能注销自己
@@ -208,8 +208,6 @@ public class UserService {
     public static void updateUser(HttpServletRequest request, HttpServletResponse response) {
         User reqUser = UserService.getUserInfoFromHeader(request);
         try {
-
-
             if (reqUser == null) {
                 RespSendUtil.sendErrorResponse(response, "User not found!");
                 return;
@@ -218,13 +216,13 @@ public class UserService {
             String paramUserType = request.getParameter("UserType") != null ? request.getParameter("UserType") : "0";
             long reqUserID;
             int reqUserType;
-            if (reqUser.getUserID() == 2) {
+            if (reqUser.getUserType() == 2) {
                 paramUserID = request.getParameter("UserID") != null ? request.getParameter("UserID") : null;
                 if (paramUserID == null) {
                     RespSendUtil.sendErrorResponse(response, "缺少必要参数");
                     return;
                 }
-                reqUserID = Integer.parseInt(paramUserID);
+                reqUserID = Long.parseLong(paramUserID);
                 reqUserType = paramUserType != null ? Integer.parseInt(paramUserType) : 0;
             } else {
                 reqUserID = reqUser.getUserID();
@@ -285,34 +283,28 @@ public class UserService {
 
         User reqUser = UserService.getUserInfoFromHeader(request);
         String paramUserID = request.getParameter("UserID");
-        int UserID;
-
+        long UserID;
         try {
-            if (reqUser != null) {
-                if (reqUser.getUserType() == 2) {
-                    if (paramUserID != null) {
-                        UserID = Integer.parseInt(paramUserID);
-                        User resUser = UserDao.queryOneUserByID(UserID);
-                        if (resUser != null) {
-                            RespSendUtil.sendSuccessResponse(response, resUser);
-                        } else {
-                            RespSendUtil.sendErrorResponse(response, "用户不存在");
-                        }
-                    } else {
-                        List<User> resUserList = UserDao.queryAllUser();
-                        System.out.println(resUserList);
-                        RespSendUtil.sendSuccessResponse(response, resUserList);
-                    }
-                } else {
-                    User resUser = UserDao.queryOneUserByID(reqUser.getUserID());
-                    RespSendUtil.sendSuccessResponse(response, resUser);
-                }
+            if (reqUser == null) {
+                RespSendUtil.sendErrorResponse(response);
+                return;
             }
-        } catch (SQLException | IOException e) {
+            if (reqUser.getUserType() != 2) {
+                User resUser = UserDao.queryOneUserByID(reqUser.getUserID());
+                RespSendUtil.sendSuccessResponse(response, resUser);
+                return;
+            }
+            if (paramUserID != null) {
+                UserID = Long.parseLong(paramUserID);
+                User resUser = UserDao.queryOneUserByID(UserID);
+                RespSendUtil.sendSuccessResponse(response, resUser);
+            } else {
+                List<User> resUserList = UserDao.queryAllUser();
+                RespSendUtil.sendSuccessResponse(response, resUserList);
+            }
+        } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
         }
-
-
     }
 
 

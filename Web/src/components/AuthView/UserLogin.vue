@@ -17,16 +17,15 @@
 </template>
 
 <script setup lang="ts">
+import { useFrontDataStore } from '@/stores/FrontData';
 import { reactive, ref } from 'vue';
-import { ElMessage } from 'element-plus';
+
 import { useRoute, useRouter } from 'vue-router';
-import ApiUtil from '@/utils/ApiUtil';
-import { useUserDataStore } from '@/stores/UserData';
 
 const route = useRoute(); // 获取当前路由信息
 const router = useRouter(); // 路由实例，用于导航到其他路由页面。
 
-const UserData = useUserDataStore(); // 用户数据状态管理实例。
+const FrontDataStore = useFrontDataStore(); // 用户数据状态管理实例。
 
 const loginForm = reactive({
     UserID: '',
@@ -49,7 +48,7 @@ const loginFormRef = ref();
 const submitLoginForm = () => {
     loginFormRef.value?.validate((valid: boolean) => {
         if (valid) {
-            UserData.login(loginForm.UserID, loginForm.Password)
+            FrontDataStore.login(loginForm.UserID, loginForm.Password)
         } else {
             return false;
         }

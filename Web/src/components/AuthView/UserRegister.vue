@@ -38,13 +38,15 @@ import { reactive, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { useRoute, useRouter } from 'vue-router';
 import type { FormInstance, FormRules } from 'element-plus';
-import { useUserDataStore } from '@/stores/UserData';
+import { storeToRefs } from 'pinia';
+import { useFrontDataStore } from '@/stores/FrontData';
 
 const registerFormRef = ref<FormInstance>();
 const route = useRoute();
 const router = useRouter();
+const FrontDataStore = useFrontDataStore();
+const { UserData } = storeToRefs(FrontDataStore)
 
-const UserData = useUserDataStore();
 
 
 const registerForm = reactive({
@@ -95,7 +97,7 @@ const submitRegisterForm = () => {
 
     formRef.validate((valid) => {
         if (valid) {
-            UserData.register(registerForm)
+            FrontDataStore.register(registerForm)
         } else {
             console.log('表单验证失败');
         }

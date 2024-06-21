@@ -3,21 +3,17 @@
         {{ Detail }}
     </div>
     <div class="GoodsCate-Container">
-        <span>
-            分类
-        </span>
-        <el-button size="small" @click="orderByCate('all')" class="GoodsCate-Button">全部</el-button>
-        <el-button size="small" v-for="item in CateList" @click="orderByCate(item.CateName)" class="GoodsCate-Button">{{
-            item.CateName }}</el-button>
+        <span> 分类 </span> <el-button @click="FrontDataStore.saveCarttoDB"> 上 </el-button>
+        <el-button size="small" @click="FrontDataStore.setUIGoodsListByCateName('all')"
+            class="GoodsCate-Button">全部</el-button>
+        <el-button size="small" v-for="item in CateList" @click="FrontDataStore.setUIGoodsListByCateName(item.CateName)"
+            class="GoodsCate-Button">{{
+                item.CateName
+            }}</el-button>
     </div>
     <div class=" Goods-container">
-        <div class="Goods-Item-noitem" v-if="!useGoodsData.hasGoods">
-            当前分类下没有商品!
-        </div>
-        <div class="Goods-Item" v-for="item in GoodsData.GoodsList.value" :key="item.GoodsID" :data="item">
-
-            <!-- 商品图片 -->
-
+        <el-empty class="Goods-Item-noitem" description="当前分类下没有商品!" v-if="!hasUIGoods" />
+        <div class="Goods-Item" v-for="item in UIGoodsList" :key="item.GoodsID" :data="item">
             <div class="Goods-Item-Image-Container">
                 <img :src="item.GoodsImg" class="Goods-Item-image" />
             </div>
@@ -46,43 +42,25 @@
                 <div class="Goods-Item-Inven">
                     库存: {{ item.GoodsInven }}
                 </div>
-                <el-button type="primary" circle :icon="Plus" />
+                <el-button type="primary" @click="FrontDataStore.addToTempCart(item.GoodsID)" circle :icon="Plus" />
             </div>
         </div>
     </div>
 
 </template>
 <script setup lang="ts">
-import { computed, onBeforeMount, onMounted, ref } from 'vue';
-import ApiUtil from '@/utils/ApiUtil';
-
+import { onBeforeUnmount, ref } from 'vue';
 import { Plus } from '@element-plus/icons-vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useGoodsDataStore } from '@/stores/GoodsData';
+
 import { storeToRefs } from 'pinia';
+import { useFrontDataStore } from '@/stores/FrontData';
 
-
-const Route = useRoute(); // 获取路由参数
-
+const FrontDataStore = useFrontDataStore();
+const { UIGoodsList, CateList, hasUIGoods } = storeToRefs(FrontDataStore);
 const Detail = ref('文字描述')
 
-const useGoodsData = useGoodsDataStore();
-
-const GoodsData = storeToRefs(useGoodsData); // 获取商品列表数据
-
-const CateList = ref()
-
-const orderByCate = (CateName: string) => {
-    useGoodsData.getGoodsListByGoodsCate(CateName);
-}
-onMounted(() => {
-    useGoodsData.getGoodsList();
-
-
-    ApiUtil.get("/api/category").then((res) => {
-        CateList.value = res.data.data; // 获取分类列表数据
-    })
-
+onBeforeUnmount(() => {
+    FrontDataStore.saveCarttoDB()
 });
 </script>
 <style scoped>
@@ -97,6 +75,7 @@ onMounted(() => {
 }
 
 .GoodsCate-Container {
+    z-index: 99;
     padding: .5em 1em;
     position: sticky;
     top: 0;

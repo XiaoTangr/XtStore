@@ -26,10 +26,13 @@ public class CartService {
             RespSendUtil.sendErrorResponse(response, "User not found!");
             return;
         }
-        String CartJson = reqUser.getUserCart();
+        try {
+            List<GoodsInCart> list = getUserCartByID(reqUser.getUserID());
 
-        List<GoodsInCart> list = JsonUtil.toObjects(CartJson, GoodsInCart.class);
-        RespSendUtil.sendSuccessResponse(response, "获取购物车成功!", list);
+            RespSendUtil.sendSuccessResponse(response, "获取购物车成功!", list);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -69,8 +72,7 @@ public class CartService {
      * @throws SQLException e
      */
     private static List<GoodsInCart> getUserCartByID(long UserID) throws SQLException {
-        String list = UserDao.queryUserCart(UserID);
-        return JsonUtil.toObjects(list, GoodsInCart.class);
+        return UserDao.queryUserCart(UserID);
     }
 
     /**

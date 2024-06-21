@@ -19,15 +19,15 @@
 </template>
 
 <script setup lang="ts">
-import { useUserDataStore } from '@/stores/UserData';
-import JwtUtil from '@/utils/JwtUtil';
+
+import { useFrontDataStore } from '@/stores/FrontData';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const useUserData = useUserDataStore();
-const UserData = storeToRefs(useUserData);
+const FrontDataStore = useFrontDataStore();
+const UserData = storeToRefs(FrontDataStore);
 const Title = ref("航天扶贫购物中心")
 
 const linkconf = ref([

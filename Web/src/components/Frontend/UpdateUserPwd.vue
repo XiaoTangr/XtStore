@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 // 使用 defineProps 定义 props
-import { useUserDataStore } from '@/stores/UserData';
+import { useFrontDataStore } from '@/stores/FrontData';
 import type { FormInstance, FormRules } from 'element-plus';
 import { defineModel, reactive, ref } from 'vue'
 
@@ -35,7 +35,7 @@ import { defineModel, reactive, ref } from 'vue'
 const isShow = defineModel("isShow")
 
 const PwdFormRef = ref<FormInstance>();
-const useUserData = useUserDataStore();
+const FrontDataStore = useFrontDataStore();
 
 
 const PwdForm = reactive({
@@ -71,7 +71,7 @@ const onSubmitUpdate = () => {
     if (!formRef) return;
     formRef.validate((valid) => {
         if (valid) {
-            useUserData.updateUserPwd(PwdForm.oldPassword, PwdForm.Password, PwdForm.Password1);
+            FrontDataStore.updateUserPwd(PwdForm.oldPassword, PwdForm.Password, PwdForm.Password1);
 
         } else {
             console.log('表单验证失败');

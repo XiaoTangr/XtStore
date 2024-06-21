@@ -4,7 +4,7 @@ import JwtUtil from './JwtUtil';
 
 
 const ApiUtil = axios.create({
-    baseURL: 'http://localhost:8181/',
+    baseURL: 'http://localhost:30836/',
     timeout: 5000,
     headers: {
         "Content-Type": "multipart/form-data"

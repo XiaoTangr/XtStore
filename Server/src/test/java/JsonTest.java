@@ -51,7 +51,6 @@ public class JsonTest {
             goodsInCart.setGoodsName("测试" + i);
             goodsInCart.setCountNum(i);
             goodsInCart.setGoodsPerPrice(i);
-            goodsInCart.setGoodsImg("#");
             list.add(goodsInCart);
         }
         System.out.println(JsonUtil.toJson(list));
