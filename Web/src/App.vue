@@ -13,17 +13,7 @@ import { useFrontDataStore } from '@/stores/FrontData';
 const FrontDataStore = useFrontDataStore();
 
 
-// 离开时保存购物车
-onMounted(() => {
-    window.addEventListener('beforeunload', handleBeforeUnload);
-});
-const handleBeforeUnload = () => {
-    FrontDataStore.saveCarttoDB();
-};
 
-onBeforeUnmount(() => {
-    window.removeEventListener('beforeunload', handleBeforeUnload);
-});
 </script>
 
 

@@ -1,20 +1,21 @@
 import { computed, ref } from 'vue'
 import { defineStore, storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
-import { useRouter } from 'vue-router'
+
 import ApiUtil from '@/utils/ApiUtil'
 import JwtUtil from '@/utils/JwtUtil'
 import type { CartItem } from '@/types/CartItem'
+import { useRouter } from 'vue-router'
 
 
 export const useFrontDataStore = defineStore('FrontData', () => {
   // Public
   const router = useRouter()
-
   const DataInit = () => {
-
-    getUserDataByJwt()
-    getCartfromDB()
+    if (JwtUtil.isJwtExist()) {
+      getUserDataByJwt();
+      getCartfromDB()
+    }
     getGoodsfromDB()
 
   }
@@ -32,7 +33,10 @@ export const useFrontDataStore = defineStore('FrontData', () => {
     UserAddr: "",
     UserCart: [] as CartItem[]
   })
-  const logout = () => {
+
+
+
+  const logout = async () => {
     JwtUtil.deleteJwt();
     UserJwt.value = ''
     // 重置UserData和UserJwt
@@ -47,12 +51,12 @@ export const useFrontDataStore = defineStore('FrontData', () => {
       UserAddr: "",
       UserCart: []
     }
-    router.push('/')
+    await router.push('/')
     clearTempCart()
   }
 
   const login = async (UserID: string, Password: string): Promise<boolean> => {
-    const router = useRouter();
+
     try {
       const res = await ApiUtil.post('/api/auth', {
         UserID,
@@ -261,6 +265,8 @@ export const useFrontDataStore = defineStore('FrontData', () => {
   const UIGoodsList: any = ref([]);
   const CateList: any = ref([])
 
+  const activeCate = ref('all')
+
   const hasUIGoods = computed(() => { // 计算属性，用于判断商品列表数据源是否为空。
     return UIGoodsList.value.length > 0
   })
@@ -279,6 +285,7 @@ export const useFrontDataStore = defineStore('FrontData', () => {
   }
 
   const setUIGoodsListByCateName = (CateName: string) => {
+    activeCate.value = CateName; // 设置当前激活的分类名称。
     if (CateName === 'all') {
       UIGoodsList.value = GoodsList.value
     } else {
@@ -310,7 +317,7 @@ export const useFrontDataStore = defineStore('FrontData', () => {
       GoodsID: IteminGoodsList.GoodsID,
       GoodsName: IteminGoodsList.GoodsName,
       // GoodsImg: IteminGoodsList.GoodsImg,
-      GoodsPerPrice: IteminGoodsList.GoodsPrice,
+      GoodsPerPrice: IteminGoodsList.GoodsPerPrice,
       CountNum: 1,
     }
     if (IteminCartList) { // 购物车中已有该商品，数量加1
@@ -364,6 +371,7 @@ export const useFrontDataStore = defineStore('FrontData', () => {
     GoodsList,
     UIGoodsList,
     CateList,
+    activeCate,
     setUIGoodsListByCateName,
     getGoodsfromDB,
     hasUIGoods,

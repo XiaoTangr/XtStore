@@ -1,14 +1,19 @@
 <template>
     <div class="Detail-Container">
-        {{ Detail }}
+        <el-carousel type="card" height="240px" motion-blur>
+            <el-carousel-item v-for="item in Detail" :key="item">
+                <div class="Detail-ImageItem">
+                    <el-image :src="item.src" style="height: 240px;" fit="cover" class="Detail-Image" />
+                </div>
+            </el-carousel-item>
+        </el-carousel>
     </div>
     <div class="GoodsCate-Container">
-        <span> 分类 </span> <el-button @click="FrontDataStore.saveCarttoDB"> 上 </el-button>
-        <el-button size="small" @click="FrontDataStore.setUIGoodsListByCateName('all')"
-            class="GoodsCate-Button">全部</el-button>
-        <el-button size="small" v-for="item in CateList" @click="FrontDataStore.setUIGoodsListByCateName(item.CateName)"
-            class="GoodsCate-Button">{{
-                item.CateName
+        <el-button size="small" @click="FrontDataStore.setUIGoodsListByCateName('all')" class="GoodsCate-Button"
+            :type="activeCate === 'all' ? 'primary' : ''">全部</el-button>
+        <el-button size="small" v-for="item in CateList" :type="activeCate === item.CateName ? 'primary' : ''"
+            @click="FrontDataStore.setUIGoodsListByCateName(item.CateName)" class="GoodsCate-Button">{{
+            item.CateName
             }}</el-button>
     </div>
     <div class=" Goods-container">
@@ -56,8 +61,13 @@ import { storeToRefs } from 'pinia';
 import { useFrontDataStore } from '@/stores/FrontData';
 
 const FrontDataStore = useFrontDataStore();
-const { UIGoodsList, CateList, hasUIGoods } = storeToRefs(FrontDataStore);
-const Detail = ref('文字描述')
+const { UIGoodsList, CateList, hasUIGoods, activeCate } = storeToRefs(FrontDataStore);
+const Detail = ref([
+    { src: "src/assets/imgs/header/11.png" },
+    { src: "src/assets/imgs/header/22.png" },
+    { src: "src/assets/imgs/header/33.png" },
+    { src: "src/assets/imgs/header/44.png" },
+])
 
 onBeforeUnmount(() => {
     FrontDataStore.saveCarttoDB()
@@ -85,8 +95,16 @@ onBeforeUnmount(() => {
 
 
 .Detail-Container {
+    height: 240px;
+    width: 100%;
+}
 
-    padding: .5em 1em;
+.Detail-ImageItem {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .Goods-Item-Info-Container,

@@ -9,6 +9,7 @@
                 <span>
                     欢迎用户: {{ UserData.UserData.value.UserName }}
                 </span>
+                <el-link style="padding: 0 10px;" type="info" @click="FrontDataStore.logout"> [退出登录] </el-link>
             </el-menu-item>
 
             <el-menu-item v-for="(item, index) in linkconf" :index="index.toString()" :key="index" :href="item.url">

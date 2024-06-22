@@ -2,65 +2,87 @@
     <div class="UserCenter-Container">
         <UpdateUserPwd v-model:isShow="isPwdEdit" />
 
-        <el-card class="UserInfo-Container" shadow="always">
-            <template #header>
-                <h2>你的信息</h2>
-            </template>
-            <el-form ref="UserInfoFormRef" class="login-form" :model="UserInfoForm" label-position="right"
-                :rules="UserInfoRules">
-                <el-form-item label="登录账号" prop="UserID">
-                    <el-input disabled style="width: 250px;" v-model="UserInfoForm.UserID" clearable
-                        autocomplete="off" />
-                </el-form-item>
-                <el-form-item label="用户昵称" prop="UserName">
-                    <el-input :disabled="!isEdit" style="width: 250px;" v-model="UserInfoForm.UserName" clearable
-                        autocomplete="off" />
-                </el-form-item>
-                <el-form-item label="手机号码" prop="UserPhone">
-                    <el-input :disabled="!isEdit" style="width: 250px;" v-model="UserInfoForm.UserPhone" clearable
-                        autocomplete="off" />
-                </el-form-item>
-                <el-form-item label="收货地址" prop="UserAddr">
-                    <el-input :disabled="!isEdit" style="width: 250px;" v-model="UserInfoForm.UserAddr" clearable
-                        autocomplete="off" />
-                </el-form-item>
-                <el-form-item v-if="isEdit">
+
+        <div class="UserInfo-Container ">
+            <el-card class="UserInfo-main" shadow="always">
+                <template #header>
+                    <h2>你的信息</h2>
+                </template>
+                <el-form ref="UserInfoFormRef" class="UserInfo-form" :model="UserInfoForm" label-position="right"
+                    :rules="UserInfoRules">
+                    <el-form-item label="登录账号" prop="UserID">
+                        <el-input disabled style="width: 250px;" v-model="UserInfoForm.UserID" clearable
+                            autocomplete="off" />
+                    </el-form-item>
+                    <el-form-item label="用户昵称" prop="UserName">
+                        <el-input :disabled="!isEdit" style="width: 250px;" v-model="UserInfoForm.UserName" clearable
+                            autocomplete="off" />
+                    </el-form-item>
+                    <el-form-item label="手机号码" prop="UserPhone">
+                        <el-input :disabled="!isEdit" style="width: 250px;" v-model="UserInfoForm.UserPhone" clearable
+                            autocomplete="off" />
+                    </el-form-item>
+                    <el-form-item label="收货地址" prop="UserAddr">
+                        <el-input :disabled="!isEdit" style="width: 250px;" v-model="UserInfoForm.UserAddr" clearable
+                            autocomplete="off" />
+                    </el-form-item>
+                    <el-form-item v-if="isEdit">
+                        <div class="btn-container">
+                            <el-button @click="onSubmitDelete" class="btn" type="danger">注销账号</el-button>
+                            <el-button @click="isPwdEdit = true" class="btn" type="warning">修改密码</el-button>
+                            <el-button @click="onSubmitUpdate" class="btn" type="primary">提交修改</el-button>
+                            <el-button @click="onCancelUpdate" class="btn" type="info">取消修改</el-button>
+                        </div>
+                    </el-form-item>
+                </el-form>
+                <template #footer>
                     <div class="btn-container">
-                        <el-button @click="onSubmitDelete" class="btn" type="danger">注销账号</el-button>
-                        <el-button @click="isPwdEdit = true" class="btn" type="warning">修改密码</el-button>
-                        <el-button @click="onSubmitUpdate" class="btn" type="primary">提交修改</el-button>
-                        <el-button @click="onCancelUpdate" class="btn" type="info">取消修改</el-button>
+                        <el-button @click="isEdit = !isEdit" class="btn" type="primary">{{ isEdit ? '取消修改' : '修改信息'
+                            }}</el-button>
+                        <el-button @click="onSubmitLogout" class="btn">退出登录</el-button>
                     </div>
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <div class="btn-container">
-                    <el-button @click="isEdit = !isEdit" class="btn" type="primary">{{ isEdit ? '取消修改' : '修改信息'
-                        }}</el-button>
-                    <el-button @click="onSubmitLogout" class="btn">退出登录</el-button>
-                </div>
-            </template>
-
-
-        </el-card>
-        <div class="UserCart-Container">
-            <el-button @click="saveCart">
-                saveCart
-            </el-button>
-            <el-card v-for="(item, index) in tempUserCart" :key="index" :cart="item">
-                名称: {{ item.GoodsName }}
-                单价: ${{ item.GoodsPerPrice }}
-                数量:
-                <el-input-number v-model="item.CountNum" :min="0" controls-position="right" :precision="0"
-                    size="small" />
-                合计: ${{ item.GoodsPerPrice * item.CountNum }}
+                </template>
             </el-card>
+        </div>
+        <div class="UserCart-Container">
+            <div class="UserCart-main">
+                <div class="CartItem-Container">
+                    <div class="CartItem" v-if="tempUserCart.length <= 0">
+                        <el-empty description="您的购物车还没有商品,去首页选购叭" />
+                    </div>
+                    <div class="CartItem" v-for="(item, index) in tempUserCart" :key="index">
+                        <el-card>
+
+                            <div class="CartItem-Header">
+                                <p class="CartItem-Title">{{ item.GoodsName }}</p>
+                                <p class="CartItem-PerPrice"> ${{ item.GoodsPerPrice }}/份</p>
+                            </div>
+                            <template #footer>
+                                <div class="CartItem-Footer">
+                                    <div class="CartItem-CountPrice">
+                                        小计: ${{ item.GoodsPerPrice * item.CountNum }}
+                                    </div>
+                                    <el-input-number v-model="item.CountNum" :min="0" :max="99" controls-position="right"
+                                        :precision="0" />
+                                </div>
+                            </template>
+                        </el-card>
+                    </div>
+                </div>
+                <div class="CartOperate-Container" v-if="tempUserCart.length > 0">
+                    <el-button @click="FrontDataStore.clearTempCart"> 清空 </el-button>
+                    <div class="CartOperat-CountPrice">
+                        <span>合计:</span><span>{{ TotalPrice }} </span>
+                    </div>
+                    <el-button type="primary" @click=""> 结算 </el-button>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus';
 import { storeToRefs } from 'pinia';
 import UpdateUserPwd from "@/components/Frontend/UpdateUserPwd.vue"
@@ -73,14 +95,13 @@ const FrontDataStore = useFrontDataStore();
 const { tempUserCart, UserData } = storeToRefs(FrontDataStore);
 
 
-const saveCart = async () => {
-    const res = await FrontDataStore.saveCarttoDB()
-    if (res) {
-        ElMessage.success('保存成功');
-    } else {
-        ElMessage.error('保存失败');
+const TotalPrice = computed(() => {
+    let sum = 0;
+    for (let i = 0; i < tempUserCart.value.length; i++) {
+        sum += tempUserCart.value[i].GoodsPerPrice * tempUserCart.value[i].CountNum;
     }
-};
+    return sum.toFixed(2); // 保留两位小数，并转换为字符串。
+});
 watch(tempUserCart, (newVal, oldVal) => {
     // 监听tempUserCart的变化，当CountNum为0时，移除该商品。
     for (let i = newVal.length - 1; i >= 0; i--) {
@@ -154,20 +175,49 @@ const onSubmitLogout = () => {
 }
 
 .UserInfo-Container {
-    width: 24em;
-    /* height: 32em; */
-    margin: 1em;
-    margin-right: .5em;
+    padding: .5em .25em;
+    width: 50vw;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: end;
 }
 
 .UserCart-Container {
-    flex: 1;
+    width: 50vw;
     height: 100%;
+    /* flex: 1; */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
     overflow: hidden;
     overflow-y: auto;
-    margin: 1em;
-    margin-left: .5em;
 }
+
+.UserInfo-main {
+    width: 24em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+.UserCart-main {
+    height: 100%;
+    width: 24em;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    align-items: start;
+    overflow: hidden;
+}
+
+.UserInfo-form {
+    width: 100%;
+}
+
 
 .btn-container {
     margin: 0 1em;
@@ -175,10 +225,81 @@ const onSubmitLogout = () => {
     display: flex !important;
     justify-content: center;
     /* flex-direction: column; */
+}
 
-    .btn {
-        width: calc(50% - 1em);
-        margin: .5em !important;
-    }
+.btn {
+    width: calc(50% - 1em);
+    margin: .5em !important;
+}
+
+.CartItem-Container {
+    flex: 1;
+    width: 24em;
+    height: calc(100% - 64px);
+    overflow: hidden;
+    overflow-y: auto;
+
+}
+
+.CartOperate-Container {
+    height: 64px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: sticky;
+    padding: 1em;
+    bottom: 0;
+    width: 100%;
+    z-index: 100;
+}
+
+.CartItem {
+    /* background-color: red; */
+    padding: .5em .25em;
+    width: 24em;
+    /* margin: 1em 0; */
+}
+
+.CartItem-Header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.CartItem-Title {
+    flex: 1;
+    font-size: 1.2em;
+    font-weight: bolder;
+}
+
+
+.CartItem-Footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.CartItem-CountPrice {
+    flex: 1;
+    font-size: 1.1em;
+    font-weight: bolder;
+    color: rgb(255, 91, 91);
+}
+
+
+.CartOperat-CountPrice {
+    flex: 1;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    font-size: 1.2em;
+    font-weight: bolder;
+    color: rgb(255, 91, 91);
+    margin: 0 1em 0 0 !important;
+}
+
+.CartItem-NoItem {
+    background-color: red;
+    height: 100%;
 }
 </style>
