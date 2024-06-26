@@ -1,27 +1,47 @@
-## 如何食用
+## 其他说明
 
-如果你有git, 请自行clone 
+###  1 数据库说明
 
-如果你没有, 请自行下载zip
+1. 项目使用MySQL8
+
+2. 请使用DB.sql创建数据库。
+
+### 2 Server部署和运行
 
 
 
-部署和运行,
+#### 1 必须使用Tomcat10以及以上版本
 
-1 构建数据库,详见DB.sql
+	1. 由于Tomcat9不支持Servlet5.0规范，故推荐使用Tomcat10或者11
+	1. 使用maven安装依赖
+	1. 运行端口请指定为30836
+	1. 请设置应用程序上下文（web根路径）为  / ，如图：
 
-2 构建后端
+![image-20240626121437802](https://ftp.icefox.site/blog/images/202406261214209.png)
 
-​	安装maven依赖
+5. *设置你的数据库用户名和密码，默认两者均为root，路径如下
 
-​	可能需要修改数据库配置相关,在/Utils包下
+``` txt
+Server/src/main/java/site/icefox/xtstore/Utils/DbConnectionUtil.java
+```
 
-​	使用Tomca11
+### 3 Web部署和运行
 
-​	设置项目运行目录为 127.0.0.1:8181
+#### 1  安装 pnpm
 
-​	访问 127.0.0.1:8181/api/goods 检查是否有正确的数据
+``` bash
+npm i pnpm -g
+```
 
-3 构建前端
+#### 2 安装依赖
 
-​	npm 三连运行
+``` bash
+pnpm install
+```
+
+#### 3 运行
+
+``` bash
+pnpm run dev
+```
+
