@@ -60,10 +60,10 @@
                             <template #footer>
                                 <div class="CartItem-Footer">
                                     <div class="CartItem-CountPrice">
-                                        小计: ${{ item.GoodsPerPrice * item.CountNum }}
+                                        小计: ￥{{ item.GoodsPerPrice * item.CountNum }}
                                     </div>
-                                    <el-input-number v-model="item.CountNum" :min="0" :max="99" controls-position="right"
-                                        :precision="0" />
+                                    <el-input-number v-model="item.CountNum" :min="0" :max="99"
+                                        controls-position="right" :precision="0" />
                                 </div>
                             </template>
                         </el-card>
@@ -72,7 +72,7 @@
                 <div class="CartOperate-Container" v-if="tempUserCart.length > 0">
                     <el-button @click="FrontDataStore.clearTempCart"> 清空 </el-button>
                     <div class="CartOperat-CountPrice">
-                        <span>合计:</span><span>{{ TotalPrice }} </span>
+                        <span>合计:</span><span> ￥{{ TotalPrice }} </span>
                     </div>
                     <el-button type="primary" @click=""> 结算 </el-button>
                 </div>
@@ -82,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus';
 import { storeToRefs } from 'pinia';
 import UpdateUserPwd from "@/components/Frontend/UpdateUserPwd.vue"
@@ -102,22 +102,9 @@ const TotalPrice = computed(() => {
     }
     return sum.toFixed(2); // 保留两位小数，并转换为字符串。
 });
-watch(tempUserCart, (newVal, oldVal) => {
-    // 监听tempUserCart的变化，当CountNum为0时，移除该商品。
-    for (let i = newVal.length - 1; i >= 0; i--) {
-        if (newVal[i].CountNum === 0) {
-            newVal.splice(i, 1);
-        }
-    }
 
-}, { deep: true });
 
-const UserInfoForm = reactive({
-    UserID: UserData.value.UserID,
-    UserName: UserData.value.UserName,
-    UserPhone: UserData.value.UserPhone,
-    UserAddr: UserData.value.UserAddr,
-});
+const UserInfoForm = UserData.value; // 获取用户信息表单数据。
 
 const isEdit = ref(false);
 const isPwdEdit = ref(false);
@@ -160,6 +147,15 @@ const onSubmitDelete = () => {
 const onSubmitLogout = () => {
     FrontDataStore.logout();
 };
+watch(tempUserCart, (newVal, oldVal) => {
+    // 监听tempUserCart的变化，当CountNum为0时，移除该商品。
+    for (let i = newVal.length - 1; i >= 0; i--) {
+        if (newVal[i].CountNum === 0) {
+            newVal.splice(i, 1);
+        }
+    }
+
+}, { deep: true });
 </script>
 
 <style scoped>

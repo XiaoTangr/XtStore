@@ -207,36 +207,40 @@ public class UserService {
      */
     public static void updateUser(HttpServletRequest request, HttpServletResponse response) {
         User reqUser = UserService.getUserInfoFromHeader(request);
+        User resUser = null;
+        String ParamResUserID = request.getParameter("UserType");
+        long ResUserID;
+        int ResUserType;
         try {
             if (reqUser == null) {
                 RespSendUtil.sendErrorResponse(response, "User not found!");
                 return;
             }
-            String paramUserID;
-            String paramUserType = request.getParameter("UserType") != null ? request.getParameter("UserType") : "0";
-            long reqUserID;
-            int reqUserType;
-            if (reqUser.getUserType() == 2) {
-                paramUserID = request.getParameter("UserID") != null ? request.getParameter("UserID") : null;
-                if (paramUserID == null) {
-                    RespSendUtil.sendErrorResponse(response, "缺少必要参数");
+//          先设置UserType
+            ResUserType = reqUser.getUserType();
+//            设置resUserID
+            resUser = UserDao.queryOneUserByID(reqUser.getUserID());
+//            如果是管理员,则可修改其他用户的USerType,且必须指定修改的UserID
+            if (reqUser.getUserType() > 1) {
+                if (ParamResUserID == null) {
+                    RespSendUtil.sendErrorResponse(response, "管理员需要指定UserID!");
                     return;
                 }
-                reqUserID = Long.parseLong(paramUserID);
-                reqUserType = paramUserType != null ? Integer.parseInt(paramUserType) : 0;
+                ResUserID = Integer.parseInt(ParamResUserID);
+                if (request.getParameter("UserType") != null) {
+                    ResUserType = Integer.parseInt(request.getParameter("UserType"));
+                }
             } else {
-                reqUserID = reqUser.getUserID();
-                reqUserType = reqUser.getUserType();
+                ResUserID = reqUser.getUserID();
             }
-            reqUser = UserDao.queryOneUserByID(reqUserID);
 
+            resUser.setUserID(ResUserID);
+            resUser.setUserType(ResUserType);
+            //        如果任一有值则需要判断密码，否则不更改密码
             String oldPassword = request.getParameter("oldPassword");
             String Password = request.getParameter("Password");
             String Password1 = request.getParameter("Password1");
 
-            if (request.getParameter("UserName") != null)
-                reqUser.setUserName(request.getParameter("UserName"));
-//        如果任一有值则需要判断密码，否则不更改密码
             if (Password != null || Password1 != null || oldPassword != null) {
                 if (Password != null && Password1 != null && oldPassword != null) {
                     if (!MD5Util.compareMd5WithString(reqUser.getPassword(), oldPassword)) {
@@ -254,21 +258,24 @@ public class UserService {
                     return;
                 }
             }
+
+
+            if (request.getParameter("UserName") != null)
+                reqUser.setUserName(request.getParameter("UserName"));
+
             if (request.getParameter("UserPhone") != null)
                 reqUser.setUserPhone(request.getParameter("UserPhone"));
             if (request.getParameter("UserAddr") != null)
                 reqUser.setUserAddr(request.getParameter("UserAddr"));
             if (request.getParameter("UserCart") != null)
                 reqUser.setUserCart(request.getParameter("UserCart"));
-            reqUser.setUserType(reqUserType);
 
-            if (UserDao.updateUser(reqUser)) {
-                User newdata = UserDao.queryOneUserByID(reqUserID);
-                RespSendUtil.sendSuccessResponse(response, newdata);
+            if (UserDao.updateUser(resUser)) {
+                RespSendUtil.sendSuccessResponse(response, resUser);
             } else {
                 RespSendUtil.sendErrorResponse(response);
             }
-        } catch (SQLException | IOException e) {
+        } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
         }
     }

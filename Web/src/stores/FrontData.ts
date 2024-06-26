@@ -6,6 +6,7 @@ import ApiUtil from '@/utils/ApiUtil'
 import JwtUtil from '@/utils/JwtUtil'
 import type { CartItem } from '@/types/CartItem'
 import { useRouter } from 'vue-router'
+import _ from 'lodash'; // 如果您还没有安装 lodash，请运行 `npm install lodash`
 
 
 export const useFrontDataStore = defineStore('FrontData', () => {
@@ -27,7 +28,7 @@ export const useFrontDataStore = defineStore('FrontData', () => {
     oldPassword: '',
     Password: '',
     Password1: '',
-    UserType: 0,
+    UserType: -1 as number,
     UserName: '',
     UserPhone: '',
     UserAddr: "",
@@ -264,12 +265,28 @@ export const useFrontDataStore = defineStore('FrontData', () => {
   const GoodsList = ref([]); // 定义商品列表数据源。
   const UIGoodsList: any = ref([]);
   const CateList: any = ref([])
-
+  const activeDetailGoods: any = ref({
+    GoodsID: -2 as number,
+    GoodsName: "" ,
+    GoodsDesc: "",
+    GoodsImg: "",
+    GoodsPerPrice: -2 as number,
+    GoodsPerUnit: "",
+    GoodsInven: -2 as number,
+    GoodsCate: ""
+  }); // 定义当前激活的商品详情数据。
   const activeCate = ref('all')
 
   const hasUIGoods = computed(() => { // 计算属性，用于判断商品列表数据源是否为空。
     return UIGoodsList.value.length > 0
   })
+
+  const activeDetailGoodsByID = (GoodsID: number) => { // 根据商品ID获取当前激活的商品详情数据。
+    const IteminGoodsList: any = GoodsList.value.find((item: { GoodsID: number }) => item.GoodsID === GoodsID) as CartItem | undefined // 查找商品列表数据源中与当前商品ID匹配的商品。
+    if (IteminGoodsList) { // 如果找到了匹配的商品，则更新当前激活的商品详情数据。
+      activeDetailGoods.value = _.cloneDeep(IteminGoodsList); // 更新当前激活的商品详情数据。
+    }
+  }
 
 
   const getGoodsfromDB = () => {
@@ -360,6 +377,7 @@ export const useFrontDataStore = defineStore('FrontData', () => {
     // User
     UserData,
     UserJwt,
+    getUserDataByJwt,
     login,
     logout,
     register,
@@ -375,6 +393,8 @@ export const useFrontDataStore = defineStore('FrontData', () => {
     setUIGoodsListByCateName,
     getGoodsfromDB,
     hasUIGoods,
+    activeDetailGoods,
+    activeDetailGoodsByID,
 
     // Cart
     tempUserCart,

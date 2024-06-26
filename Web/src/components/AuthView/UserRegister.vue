@@ -1,7 +1,5 @@
 <template>
     <div class="RegisterForm-Container">
-
-
         <el-form ref="registerFormRef" class="login-form" :model="registerForm" label-position="right"
             :rules="registerRules">
             <el-form-item label="登录账号" prop="UserID">

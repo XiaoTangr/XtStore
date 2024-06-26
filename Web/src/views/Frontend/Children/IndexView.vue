@@ -13,7 +13,7 @@
             :type="activeCate === 'all' ? 'primary' : ''">全部</el-button>
         <el-button size="small" v-for="item in CateList" :type="activeCate === item.CateName ? 'primary' : ''"
             @click="FrontDataStore.setUIGoodsListByCateName(item.CateName)" class="GoodsCate-Button">{{
-            item.CateName
+                item.CateName
             }}</el-button>
     </div>
     <div class=" Goods-container">
@@ -28,7 +28,7 @@
                 </div>
                 <div class="Goods-Item-price">
                     <span class="Goods-Item-price-per">
-                        ${{ item.GoodsPerPrice }}
+                        ￥{{ item.GoodsPerPrice }}
                     </span>
                     <span class="Goods-Item-price-unit">
                         {{ item.GoodsPerUnit }}
@@ -47,15 +47,22 @@
                 <div class="Goods-Item-Inven">
                     库存: {{ item.GoodsInven }}
                 </div>
-                <el-button type="primary" @click="FrontDataStore.addToTempCart(item.GoodsID)" circle :icon="Plus" />
+                <div class="Goods-Item-operate-Btns">
+                    <el-button type="primary" @click="FrontDataStore.activeDetailGoodsByID(item.GoodsID)" circle
+                        :icon="View" />
+                    <el-button type="primary" @click="FrontDataStore.addToTempCart(item.GoodsID)" circle :icon="Plus" />
+                </div>
             </div>
         </div>
+        <GoodsDetail />
     </div>
 
 </template>
 <script setup lang="ts">
+import GoodsDetail from "@/components/Frontend/GoodsDetail.vue"; // 导入组件
+
 import { onBeforeUnmount, ref } from 'vue';
-import { Plus } from '@element-plus/icons-vue';
+import { Plus, View } from '@element-plus/icons-vue';
 
 import { storeToRefs } from 'pinia';
 import { useFrontDataStore } from '@/stores/FrontData';

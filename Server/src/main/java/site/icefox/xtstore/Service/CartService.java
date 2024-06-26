@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import site.icefox.xtstore.Dao.UserDao;
 import site.icefox.xtstore.Entities.GoodsInCart;
 import site.icefox.xtstore.Entities.User;
-import site.icefox.xtstore.Utils.JsonUtil;
 import site.icefox.xtstore.Utils.RespSendUtil;
 
 import java.io.IOException;
